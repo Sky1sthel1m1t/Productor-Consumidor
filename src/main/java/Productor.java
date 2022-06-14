@@ -10,9 +10,7 @@ public class Productor extends Thread {
     @Override
     public void run() {
         while (true){
-            granero.producir(panes);
-            System.out.println("Soy el cocinero, he preparado " + panes + " panes y quedan "
-                    + granero.getCantidadPanes() + " panes");
+            granero.producir(panes, this);
 
         }
     }

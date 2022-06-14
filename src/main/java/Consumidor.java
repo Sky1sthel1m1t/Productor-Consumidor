@@ -3,19 +3,35 @@ public class Consumidor extends Thread{
     private Granero granero;
     private String nombre;
     private int panConsumir = 1;
+    private int turno;
 
-    public Consumidor(Granero granero, String nombre) {
+    public Consumidor(Granero granero, String nombre, int panConsumir, int turno) {
         this.granero = granero;
         this.nombre = nombre;
+        this.panConsumir = panConsumir;
+        this.turno = turno;
     }
 
     @Override
     public void run() {
         while (true){
-            this.granero.consumir();
-            System.out.println("Soy la persona " + nombre + " y me he sacado " + panConsumir + " panes");
-            System.out.println("Quedan " + this.granero.getCantidadPanes());
-
+            this.granero.consumir(this );
         }
+    }
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public int getPanConsumir() {
+        return panConsumir;
+    }
+
+    public void setPanConsumir(int panConsumir) {
+        this.panConsumir = panConsumir;
     }
 }

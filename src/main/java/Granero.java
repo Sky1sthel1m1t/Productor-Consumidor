@@ -15,7 +15,7 @@ public class Granero {
         iniciar();
     }
 
-    public synchronized void consumir() {
+    public synchronized void consumir(Consumidor consumidor) {
         while (cantidadPanes <= 0) {
             try {
                 wait();
@@ -25,15 +25,19 @@ public class Granero {
         }
 
         cantidadPanes--;
+        System.out.println("Soy la persona " + consumidor.getNombre() + " y me he sacado " + consumidor.getPanConsumir()
+        + ". Quedan " + cantidadPanes + " panes");
+
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
+
         notifyAll();
     }
 
-    public synchronized void producir(int panesCocinados) {
+    public synchronized void producir(int panesCocinados, Productor productor) {
         while (cantidadPanes > 0) {
             try {
                 wait();
@@ -42,18 +46,22 @@ public class Granero {
             }
         }
 
+        cantidadPanes += panesCocinados;
+        System.out.println("Soy el cocinero, he preparado " + panesCocinados + " panes y quedan "
+                + getCantidadPanes() + " panes");
+
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-        cantidadPanes += panesCocinados;
+
         notifyAll();
     }
 
     private void generarConsumidores(int num) {
         for (int i = 0; i < num; i++) {
-            Consumidor c = new Consumidor(this, i + "");
+            Consumidor c = new Consumidor(this, i + "", 1, i);
             consumidores.add(c);
         }
     }
