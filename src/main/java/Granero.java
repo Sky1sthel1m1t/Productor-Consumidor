@@ -7,7 +7,8 @@ public class Granero {
 
     private ArrayList<Consumidor> consumidores = new ArrayList<>();
     private ArrayList<Productor> productores = new ArrayList<>();
-    private Object seguro = new Object();
+    int turnoConsumidor = 0;
+    int turnoProductor = 0;
 
     public Granero(int numConsumidores, int numProductores) {
         generarConsumidores(numConsumidores);
@@ -16,7 +17,7 @@ public class Granero {
     }
 
     public synchronized void consumir(Consumidor consumidor) {
-        while (cantidadPanes <= 0) {
+        while (cantidadPanes <= 0 || turnoConsumidor != consumidor.getTurno()) {
             try {
                 wait();
             } catch (InterruptedException e) {
@@ -25,6 +26,7 @@ public class Granero {
         }
 
         cantidadPanes--;
+        cambiarTurnoConsumidor();
         System.out.println("Soy la persona " + consumidor.getNombre() + " y me he sacado " + consumidor.getPanConsumir()
         + ". Quedan " + cantidadPanes + " panes");
 
@@ -38,7 +40,7 @@ public class Granero {
     }
 
     public synchronized void producir(int panesCocinados, Productor productor) {
-        while (cantidadPanes > 0) {
+        while (cantidadPanes > 0 || turnoProductor != productor.getTurno()) {
             try {
                 wait();
             } catch (InterruptedException e) {
@@ -46,9 +48,11 @@ public class Granero {
             }
         }
 
+
         cantidadPanes += panesCocinados;
-        System.out.println("Soy el cocinero, he preparado " + panesCocinados + " panes y quedan "
+        System.out.println("Soy el cocinero " + productor.getNombre() +", he preparado " + panesCocinados + " panes y quedan "
                 + getCantidadPanes() + " panes");
+        cambiarTurnoProductor();
 
         try {
             Thread.sleep(1000);
@@ -57,6 +61,20 @@ public class Granero {
         }
 
         notifyAll();
+    }
+
+    public void cambiarTurnoConsumidor(){
+        this.turnoConsumidor++;
+        if (this.turnoConsumidor > this.consumidores.size() - 1){
+            this.turnoConsumidor = 0;
+        }
+    }
+
+    public void cambiarTurnoProductor(){
+        this.turnoProductor++;
+        if (this.turnoProductor > this.productores.size() - 1){
+            this.turnoProductor = 0;
+        }
     }
 
     private void generarConsumidores(int num) {
@@ -68,7 +86,7 @@ public class Granero {
 
     private void generarProductores(int num) {
         for (int i = 0; i < num; i++) {
-            Productor p = new Productor(this);
+            Productor p = new Productor(this, i, i + "");
             productores.add(p);
         }
     }
@@ -97,13 +115,5 @@ public class Granero {
 
     public void setCantidadMaxPanes(int cantidadMaxPanes) {
         this.cantidadMaxPanes = cantidadMaxPanes;
-    }
-
-    public Object getSeguro() {
-        return seguro;
-    }
-
-    public void setSeguro(Object seguro) {
-        this.seguro = seguro;
     }
 }

@@ -34,4 +34,12 @@ public class Consumidor extends Thread{
     public void setPanConsumir(int panConsumir) {
         this.panConsumir = panConsumir;
     }
+
+    public int getTurno() {
+        return turno;
+    }
+
+    public void setTurno(int turno) {
+        this.turno = turno;
+    }
 }
