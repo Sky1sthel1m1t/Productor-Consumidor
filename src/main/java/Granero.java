@@ -1,3 +1,4 @@
+import java.awt.*;
 import java.util.ArrayList;
 
 public class Granero {
@@ -11,6 +12,12 @@ public class Granero {
     int asignarTurno = 0;
 
     public Granero(int numConsumidores, int numProductores) {
+        generarConsumidores(numConsumidores);
+        generarProductores(numProductores);
+        iniciar();
+    }
+
+    public Granero(int numConsumidores, int numProductores, boolean interfaz) {
         generarConsumidores(numConsumidores);
         generarProductores(numProductores);
         iniciar();

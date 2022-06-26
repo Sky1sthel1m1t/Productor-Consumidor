@@ -2,7 +2,7 @@ public class Consumidor extends Thread{
 
     private Granero granero;
     private String nombre;
-    private int panConsumir = 1;
+    private int panConsumir;
     private int turno;
 
     public Consumidor(Granero granero, String nombre, int panConsumir, int turno) {
