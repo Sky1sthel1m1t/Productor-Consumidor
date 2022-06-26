@@ -2,13 +2,13 @@ import java.util.ArrayList;
 
 public class Granero {
 
-    private int cantidadPanes;
-    private int cantidadMaxPanes;
+    private int cantidadPanes = 0;
+    private int cantidadMaxPanes = 10;
 
     private ArrayList<Consumidor> consumidores = new ArrayList<>();
     private ArrayList<Productor> productores = new ArrayList<>();
-    int turnoConsumidor = 0;
-    int turnoProductor = 0;
+    int turnoActual = 0;
+    int asignarTurno = 0;
 
     public Granero(int numConsumidores, int numProductores) {
         generarConsumidores(numConsumidores);
@@ -17,7 +17,7 @@ public class Granero {
     }
 
     public synchronized void consumir(Consumidor consumidor) {
-        while (cantidadPanes <= 0 || turnoConsumidor != consumidor.getTurno()) {
+        while (turnoActual != consumidor.getTurno()) {
             try {
                 wait();
             } catch (InterruptedException e) {
@@ -25,22 +25,24 @@ public class Granero {
             }
         }
 
-        cantidadPanes--;
-        cambiarTurnoConsumidor();
-        System.out.println("Soy la persona " + consumidor.getNombre() + " y me he sacado " + consumidor.getPanConsumir()
-        + ". Quedan " + cantidadPanes + " panes");
+        if (cantidadPanes > 0) {
+            cantidadPanes--;
+            System.out.println("Soy la persona " + consumidor.getNombre() + " y me he sacado " + consumidor.getPanConsumir()
+                    + ". Quedan " + cantidadPanes + " panes");
 
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
         }
 
+        pasarTurno();
         notifyAll();
     }
 
     public synchronized void producir(int panesCocinados, Productor productor) {
-        while (cantidadPanes > 0 || turnoProductor != productor.getTurno()) {
+        while (turnoActual != productor.getTurno()) {
             try {
                 wait();
             } catch (InterruptedException e) {
@@ -48,45 +50,39 @@ public class Granero {
             }
         }
 
+        if ((cantidadPanes + panesCocinados) < cantidadMaxPanes){
+            cantidadPanes += panesCocinados;
+            System.out.println("Soy el cocinero " + productor.getNombre() + ", he preparado " + panesCocinados + " panes y quedan "
+                    + getCantidadPanes() + " panes");
 
-        cantidadPanes += panesCocinados;
-        System.out.println("Soy el cocinero " + productor.getNombre() +", he preparado " + panesCocinados + " panes y quedan "
-                + getCantidadPanes() + " panes");
-        cambiarTurnoProductor();
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
 
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
         }
 
+        pasarTurno();
         notifyAll();
     }
 
-    public void cambiarTurnoConsumidor(){
-        this.turnoConsumidor++;
-        if (this.turnoConsumidor > this.consumidores.size() - 1){
-            this.turnoConsumidor = 0;
-        }
-    }
-
-    public void cambiarTurnoProductor(){
-        this.turnoProductor++;
-        if (this.turnoProductor > this.productores.size() - 1){
-            this.turnoProductor = 0;
-        }
+    public void pasarTurno() {
+        turnoActual = (int) (Math.random() * asignarTurno);
     }
 
     private void generarConsumidores(int num) {
         for (int i = 0; i < num; i++) {
-            Consumidor c = new Consumidor(this, i + "", 1, i);
+            Consumidor c = new Consumidor(this, i + "", 1, asignarTurno);
+            asignarTurno++;
             consumidores.add(c);
         }
     }
 
     private void generarProductores(int num) {
         for (int i = 0; i < num; i++) {
-            Productor p = new Productor(this, i, i + "");
+            Productor p = new Productor(this, i + "", asignarTurno);
+            asignarTurno++;
             productores.add(p);
         }
     }
@@ -95,7 +91,7 @@ public class Granero {
         ArrayList<Thread> personas = new ArrayList<>(productores);
         personas.addAll(consumidores);
         System.out.println("Hay en la ciudad " + personas.size() + " personas");
-        for (Thread persona: personas) {
+        for (Thread persona : personas) {
             persona.start();
         }
     }
