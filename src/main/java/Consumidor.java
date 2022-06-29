@@ -3,13 +3,13 @@ public class Consumidor extends Thread{
     private Granero granero;
     private String nombre;
     private int panConsumir;
-    private int turno;
 
-    public Consumidor(Granero granero, String nombre, int panConsumir, int turno) {
+
+    public Consumidor(Granero granero, String nombre, int panConsumir) {
         this.granero = granero;
         this.nombre = nombre;
         this.panConsumir = panConsumir;
-        this.turno = turno;
+
     }
 
     @Override
@@ -35,11 +35,4 @@ public class Consumidor extends Thread{
         this.panConsumir = panConsumir;
     }
 
-    public int getTurno() {
-        return turno;
-    }
-
-    public void setTurno(int turno) {
-        this.turno = turno;
-    }
 }

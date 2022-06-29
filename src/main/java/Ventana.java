@@ -3,7 +3,9 @@ import java.awt.*;
 
 public class Ventana extends JFrame {
 
-    private PanelPrincipal panelPrincipal;
+    //private PanelPrincipal panelPrincipal;
+
+    private Granero granero;
     private Dimension tamañoPantalla;
 
     public Ventana(){
@@ -13,14 +15,14 @@ public class Ventana extends JFrame {
     private void init1(){
         tamañoPantalla = Toolkit.getDefaultToolkit().getScreenSize();
         setSize(tamañoPantalla);
+        granero = new Granero(10,1,this.getSize());
         setPreferredSize(this.getSize());
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setVisible(true);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setResizable(false);
 
-        panelPrincipal = new PanelPrincipal(tamañoPantalla);
-        this.add(panelPrincipal, BorderLayout.CENTER);
+        this.add(granero, BorderLayout.CENTER);
         this.pack();
     }
 
