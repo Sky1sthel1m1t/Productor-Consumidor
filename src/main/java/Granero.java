@@ -19,10 +19,13 @@ public class Granero extends JPanel {
     private JLabel accionActual = new JLabel();
     ///
     private int cantidadMaxPanes = 10;
-    private int delay = 1;
+    private int delay = 3;
 
     private ArrayList<Consumidor> consumidores = new ArrayList<>();
     private ArrayList<Productor> productores = new ArrayList<>();
+
+    private int turnoActual = 0;
+    private int asignarTurno = 0;
 
     public Granero(int numConsumidores, int numProductores, Dimension tamaño) {
         this.setSize(tamaño);
@@ -46,7 +49,7 @@ public class Granero extends JPanel {
     }
 
     public synchronized void consumir(Consumidor consumidor) {
-        while (cantidadPanes <= 0) {
+        while (turnoActual != consumidor.getTurno()) {
             try {
                 wait();
             } catch (InterruptedException e) {
@@ -54,18 +57,35 @@ public class Granero extends JPanel {
             }
         }
 
-        lbNombrePersona.setText("Persona " + consumidor.getNombre());
-        moverPersona();
+        if (cantidadPanes > 0){
+            lbNombrePersona.setText("Persona " + consumidor.getNombre());
+            moverPersona();
+        }
 
+        pasarTurno();
         notifyAll();
     }
 
     public synchronized void producir(int panesCocinados, Productor productor) {
+        while (turnoActual != productor.getTurno()) {
+            try {
+                wait();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
         if ((cantidadPanes + panesCocinados) <= cantidadMaxPanes){
             lbNombrePersona.setText("Cocinero " + productor.getNombre());
             moverCocinero(panesCocinados);
         }
+
+        pasarTurno();
         notifyAll();
+    }
+
+    public void pasarTurno() {
+        turnoActual = (int) (Math.random() * asignarTurno);
     }
 
     private void cargarGranero(){
@@ -202,14 +222,16 @@ public class Granero extends JPanel {
 
     private void generarConsumidores(int num) {
         for (int i = 0; i < num; i++) {
-            Consumidor c = new Consumidor(this, i + "", 1);
+            Consumidor c = new Consumidor(this, i + "", 1, asignarTurno);
+            asignarTurno++;
             consumidores.add(c);
         }
     }
 
     private void generarProductores(int num) {
         for (int i = 0; i < num; i++) {
-            Productor p = new Productor(this, i + "");
+            Productor p = new Productor(this, i + "", asignarTurno);
+            asignarTurno++;
             productores.add(p);
         }
     }
