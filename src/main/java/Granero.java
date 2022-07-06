@@ -39,7 +39,7 @@ public class Granero extends JPanel {
     ///
     private int cantidadMaxPanes = 10;
     private int delay = 4;
-
+    private int tiempoDentroGranero = 750;
     private ArrayList<Consumidor> consumidores = new ArrayList<>();
     private ArrayList<Productor> productores = new ArrayList<>();
 
@@ -216,10 +216,6 @@ public class Granero extends JPanel {
         piedra3.setBounds(350, 910,110,80);
         Icon aux13 = new ImageIcon(piedra3Img.getImage().getScaledInstance(piedra3.getWidth(),piedra3.getHeight(), Image.SCALE_DEFAULT));
         piedra3.setIcon(aux13);
-
-
-
-
     }
 
     private void cargarGranero(){
@@ -235,10 +231,22 @@ public class Granero extends JPanel {
     }
 
     public void cargarCocinero (){
-        ImageIcon imgCocinero = new ImageIcon("granjero.gif");
+        ImageIcon imgCocinero = new ImageIcon("granjeroPan.gif");
         lbPersona.setBounds(entredaPersona-imgCocinero.getIconWidth(),(limiteTierra*3) - 110,150,150);
         lbNombrePersona.setBounds(entredaPersona-imgCocinero.getIconWidth(),(limiteTierra*3) - 180, lbPersona.getWidth(), 30);
         lbNombrePersona.setHorizontalAlignment(JLabel.HORIZONTAL);
+        Icon aux = new ImageIcon(imgCocinero.getImage().getScaledInstance(lbPersona.getWidth(),lbPersona.getHeight(), Image.SCALE_DEFAULT));
+        lbPersona.setIcon(aux);
+    }
+
+    public void cambiarCocinero(){
+        ImageIcon imgCocinero = new ImageIcon("granjero.gif");
+        Icon aux = new ImageIcon(imgCocinero.getImage().getScaledInstance(lbPersona.getWidth(),lbPersona.getHeight(), Image.SCALE_DEFAULT));
+        lbPersona.setIcon(aux);
+    }
+
+    public void cambiarPersona(){
+        ImageIcon imgCocinero = new ImageIcon("personaPan-unscreen.gif");
         Icon aux = new ImageIcon(imgCocinero.getImage().getScaledInstance(lbPersona.getWidth(),lbPersona.getHeight(), Image.SCALE_DEFAULT));
         lbPersona.setIcon(aux);
     }
@@ -250,10 +258,6 @@ public class Granero extends JPanel {
         lbNombrePersona.setHorizontalAlignment(JLabel.HORIZONTAL);
         Icon aux = new ImageIcon(imgConsumidor.getImage().getScaledInstance(lbPersona.getWidth(),lbPersona.getHeight(), Image.SCALE_DEFAULT));
         lbPersona.setIcon(aux);
-    }
-
-    public void cargarPensamiento(){
-
     }
 
     public void moverCocinero (int panesCocinados){
@@ -274,15 +278,21 @@ public class Granero extends JPanel {
             }
         }
 
+        lbNombrePersona.setVisible(false);
+        lbPersona.setVisible(false);
         this.cantidadPanes += panesCocinados;
         this.lbCantidadPanes.setText("Cantidad de panes: " + cantidadPanes);
         int salida = mitad - 87;
 
         try {
-            Thread.sleep(250);
+            Thread.sleep(tiempoDentroGranero);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
+
+        cambiarCocinero();
+        lbNombrePersona.setVisible(true);
+        lbPersona.setVisible(true);
 
         for (int i = salida; i < (this.getWidth()+auxImg.getWidth()); i++) {
             lbNombrePersona.setBounds((i), auxNombre.getY(), auxNombre.getWidth(), auxNombre.getHeight());
@@ -313,15 +323,21 @@ public class Granero extends JPanel {
             }
         }
 
+        lbNombrePersona.setVisible(false);
+        lbPersona.setVisible(false);
         this.cantidadPanes--;
         this.lbCantidadPanes.setText("Cantidad de panes: " + cantidadPanes);
         int salida = mitad - 87;
 
         try {
-            Thread.sleep(250);
+            Thread.sleep(tiempoDentroGranero);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
+
+        cambiarPersona();
+        lbNombrePersona.setVisible(true);
+        lbPersona.setVisible(true);
 
         for (int i = salida; i < (this.getWidth()+auxImg.getWidth()); i++) {
             lbNombrePersona.setBounds((i), auxNombre.getY(), auxNombre.getWidth(), auxNombre.getHeight());
